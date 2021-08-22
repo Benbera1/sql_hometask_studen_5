@@ -1,0 +1,88 @@
+--task17
+--Корабли: Найдите сражения, в которых участвовали корабли класса Kongo из таблицы Ships.
+
+select battle 
+from outcomes
+where ship in (
+	select name
+	from ships
+	where class = 'Kongo')
+
+select distinct battle 
+from Outcomes
+Join Ships On Outcomes.ship=Ships.name
+Where Ships.class='Kongo'
+
+--task1
+--Корабли: Для каждого класса определите число кораблей этого класса, потопленных в сражениях. Вывести: класс и число потопленных кораблей.
+
+select c.class, count(t2.ship)
+from classes c 
+left join 
+(
+	select ships.class, outcomes.ship
+	from outcomes
+	left join ships on ships.name = outcomes.ship 
+	where outcomes.result = 'sunk'
+	)
+	as t2 on t2.ship = c.class or t2.ship = c.class
+	group by c.class
+	
+--task2
+--Корабли: Для каждого класса определите год, когда был спущен на воду первый корабль этого класса. Если год спуска на воду головного корабля неизвестен, определите минимальный год спуска на воду кораблей этого класса. Вывести: класс, год.
+
+select c.class, min(s.launched)
+from classes c 
+left join ships s on c.class=s.class
+group by c.class
+
+--task3
+--Корабли: Для классов, имеющих потери в виде потопленных кораблей и не менее 3 кораблей в базе данных, вывести имя класса и число потопленных кораблей.
+
+SELECT class, COUNT(ship) count_sunked
+FROM (SELECT name, class FROM ships
+      UNION
+      SELECT ship, ship FROM outcomes) t 
+LEFT JOIN outcomes ON name = ship AND result = 'sunk'
+GROUP BY class
+HAVING COUNT(ship) > 0 AND COUNT(*) >= 3
+
+--task4
+--Корабли: Найдите названия кораблей, имеющих наибольшее число орудий среди всех кораблей такого же водоизмещения (учесть корабли из таблицы Outcomes).
+
+select max(numguns), displacement, ship from 
+	(select ship, 
+	case  
+	when class is null then 'Unknown' 
+	else class 
+	end as class 
+	from 
+	(select ship from outcomes 
+	union 
+	select name from ships) as t1 
+	join ships 
+	on t1.ship = ships."name")as t2 
+join classes 
+on t2.class = classes."class" 
+group by displacement, ship
+
+--task5
+--Компьютерная фирма: Найдите производителей принтеров, которые производят ПК с наименьшим объемом RAM и с самым быстрым процессором среди всех ПК, имеющих наименьший объем RAM. Вывести: Maker
+
+select distinct maker
+FROM product
+WHERE model IN (
+SELECT model FROM pc
+WHERE ram = (
+  SELECT MIN(ram)
+  FROM pc
+  )
+AND speed = (
+  SELECT MAX(speed) FROM pc
+  WHERE ram = (SELECT MIN(ram)
+   FROM pc
+   )))
+   and maker IN (
+SELECT maker FROM product
+WHERE type='Printer'
+)
