@@ -1,0 +1,146 @@
+--task1  (lesson8)
+-- oracle: https://leetcode.com/problems/department-top-three-salaries/
+
+select Department.Name as Department, t1.Name as Employee, Salary from
+    (select *,
+    dense_rank() over (partition by DepartmentId order by Salary desc) as rnk
+    from Employee) as t1
+join Department
+on t1.DepartmentId = Department.Id
+where rnk < 4
+
+--task2  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/17
+
+select member_name, status, sum(unit_price * amount) as costs
+from
+    (select *, extract(year from Payments.date) as year from FamilyMembers
+    join Payments
+    on FamilyMembers.member_id = Payments.family_member) as t1
+where  year = 2005
+GROUP BY  member_name, status
+
+--task3  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/13
+
+select name from
+    (select *, row_number() over(partition by name) as rn from Passenger) as t1
+where rn > 1
+
+--task4  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/38
+
+select count(first_name) as count from Student
+where first_name = 'Anna'
+
+--task5  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/35
+
+select count(DISTINCT classroom) as count
+from Schedule
+where Schedule.date = '2019-09-02'
+
+--task6  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/38
+
+select count(first_name) as count from Student
+where first_name = 'Anna'
+
+--task7  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/32
+
+select round(avg(age),0) as age from
+    (select timestampdiff(year, birthday, now()) as age
+    from FamilyMembers) as t1
+
+--task8  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/27
+
+select good_type_name, sum(amount * unit_price) as costs from
+    (select *,
+    extract(year from Payments.date) as year 
+    from Payments
+    join
+        (select * from Goods
+        join GoodTypes
+        on Goods.type = GoodTypes.good_type_id) as t1
+    on Payments.good = t1.good_id) as t2
+where year = 2005
+group by good_type_name
+
+--task9  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/37
+
+select min(age) as year 
+from  
+    (select *,
+    timestampdiff(year, birthday, now()) as age
+    from Student) as t1
+
+--task10  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/44
+
+select max(age) as max_year from
+    (select timestampdiff(year, birthday, now()) as age, class, name
+    from Student_in_class
+    join Student
+    on Student_in_class.student = Student.id
+    join 
+        (select * from Class
+        where name like '10%') as t1
+    on Student_in_class.class = t1.id) as t2
+
+--task11 (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/20
+
+select status, member_name, sum(unit_price * amount) as costs from FamilyMembers
+join Payments
+on FamilyMembers.member_id = Payments.family_member
+join Goods
+on Payments.good = Goods.good_id
+join 
+    (select * from GoodTypes
+    where good_type_name = 'entertainment') as t1
+on Goods.type = t1.good_type_id
+group by status, member_name
+
+--task12  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/55
+
+delete from Company
+where id in 
+    (select company from 
+        (select *, dense_rank() over (order by cnt) as drnk from 
+            (select COUNT(*) as cnt, company from Trip
+            group by company) as t1) as t2
+    where drnk = 1)
+
+--task13  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/45
+
+select classroom from
+    (select *, dense_rank() over(order by cnt desc) as drnk from
+        (select count(*) as cnt, classroom from Schedule
+        GROUP BY classroom) as t1) as t2
+where drnk = 1
+
+
+--task14  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/43
+
+select distinct last_name from Schedule
+join Teacher
+on Schedule.teacher = Teacher.id
+join 
+    (select * from Subject
+    where name = 'Physical Culture') as t1
+on Schedule.subject = t1.id
+order by last_name
+
+--task15  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/63
+
+select 
+concat(last_name, '.', left(first_name, 1), '.', left(middle_name, 1), '.') as name 
+from Student
+order by name
