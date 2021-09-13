@@ -1,0 +1,67 @@
+--task1  (lesson9)
+-- oracle: https://www.hackerrank.com/challenges/the-report/problem
+
+SELECT
+    CASE WHEN G.Grade > 7 THEN S.Name ELSE 'NULL' END AS NameOrNull
+    , G.Grade
+    , S.Marks
+FROM Students S
+JOIN Grades G ON S.Marks BETWEEN G.Min_Mark AND G.Max_Mark
+ORDER BY G.Grade DESC, NameOrNull ASC, S.Marks ASC;
+
+--task2  (lesson9)
+-- oracle: https://www.hackerrank.com/challenges/occupations/problem
+
+SELECT Doctor, Professor, Singer, Actor 
+FROM 
+	(SELECT ROW_NUMBER() OVER (PARTITION BY occupation ORDER BY name) as rn, name, occupation 
+	FROM occupations) 
+PIVOT 
+	(MAX(name) FOR occupation IN ('Doctor' as Doctor,'Professor' as Professor, 'Singer' as Singer, 'Actor' as Actor)) 
+ORDER BY rn;
+
+--task3  (lesson9)
+-- oracle: https://www.hackerrank.com/challenges/weather-observation-station-9/problem
+
+SELECT DISTINCT CITY 
+FROM STATION 
+WHERE LOWER(SUBSTR(CITY,0,1)) NOT IN ('a', 'e', 'i', 'o', 'u');
+
+--task4  (lesson9)
+-- oracle: https://www.hackerrank.com/challenges/weather-observation-station-10/problem
+
+SELECT DISTINCT CITY 
+FROM STATION 
+WHERE SUBSTR(CITY,-1,1) NOT IN ('a', 'e', 'i', 'o', 'u');
+
+--task5  (lesson9)
+-- oracle: https://www.hackerrank.com/challenges/weather-observation-station-11/problem
+
+select distinct city 
+from station
+where regexp_like(city, '^[^ A, E, I, O, U, a, e, i, o, u]|[^ A, E, I, O, U, a, e, i, o, u]$');
+
+--task6  (lesson9)
+-- oracle: https://www.hackerrank.com/challenges/weather-observation-station-12/problem
+
+select distinct city from station
+where regexp_like(city, '^[^ A, E, I, O, U, a, e, i, o, u].*[^ A, E, I, O, U, a, e, i, o, u]$');
+
+--task7  (lesson9)
+-- oracle: https://www.hackerrank.com/challenges/salary-of-employees/problem
+
+select name from Employee
+where salary > 2000
+and months < 10
+order by employee_id;
+
+--task8  (lesson9)
+-- oracle: https://www.hackerrank.com/challenges/the-report/problem
+
+SELECT
+    CASE WHEN G.Grade > 7 THEN S.Name ELSE 'NULL' END AS NameOrNull
+    , G.Grade
+    , S.Marks
+FROM Students S
+JOIN Grades G ON S.Marks BETWEEN G.Min_Mark AND G.Max_Mark
+ORDER BY G.Grade DESC, NameOrNull ASC, S.Marks ASC;
